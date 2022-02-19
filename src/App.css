@@ -1,0 +1,48 @@
+body {
+  background: #282c34!important;
+  color: #fff!important;
+}
+
+.container-fluid {
+  height: 100vh;
+}
+
+.App {
+  width: 500px;
+  margin: 0 auto;
+}
+
+.box {
+  aspect-ratio: 1;
+  font-size: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bolder;
+  margin-bottom: 10px;
+  margin-right: 10px;
+  border: 5px solid #363942;
+  border-radius: 5px;
+}
+
+.box.has-letter {
+  border: 5px solid #72777c;
+}
+
+.box.green {
+  background: #2ecc71;
+}
+.box.yellow {
+  background: #f1c40f;
+}
+
+.box.gray {
+  background: #72777c;
+}
+
+.input {
+  background: #282c34!important;
+  color: #282c34!important;
+  outline: 0;
+  border: 0;
+}
