@@ -7,7 +7,7 @@ Original idea and implementation: [@powerlanguage](https://github.com/powerlangu
 #### Install
 
 ```bash
-    yarn install``
+    yarn install
     yarn start
 ```
 

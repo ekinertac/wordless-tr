@@ -3,14 +3,14 @@ import './App.css'
 import 'bootstrap/dist/css/bootstrap-grid.min.css'
 import words from './words';
 import konamiHandler from './konamiHandler'
-import { registerSW } from "virtual:pwa-register";
+import {registerSW} from "virtual:pwa-register";
 
 if ("serviceWorker" in navigator) {
   // && !/localhost/.test(window.location)) {
   registerSW();
 }
 
-const selectedWord = words[Math.floor(Math.random() * words.length)];
+const selectedWord = "kalem" //words[Math.floor(Math.random() * words.length)];
 const tr_chars = "abcçdefgğhiıjklmnoöprsştuüvyz"
 
 document.addEventListener('keydown', function (e) {
@@ -65,19 +65,32 @@ const GuessedRow = ({selected, word, onWin}) => {
         return null;
       }
 
+      // word = kakül
+      // selected = kalem
+
+      const letterStates = {};
       word.split('').map((w, idx) => {
-        multiIndexOf(selected.split(''), w).map(x => {
-          arr[idx] = 1;
-        })
-
-        if (!selected.split('').includes(w)) {
-          // if char not exists in selected word
-          arr[idx] = 0;
-        }
-
         if (selected.split('')[idx] === w) {
-          // if char is correct place in the selected word
-          arr[idx] = 2
+          arr[idx] = letterStates[w] = 2
+        }
+      })
+
+      // if char exists in selected word
+      word.split('').map((w, idx) => {
+        if (selected.split('').includes(w)) {
+          if (!letterStates[w]) {
+            arr[idx] = letterStates[w] = 1;
+          }
+        }
+      })
+
+      // if char not exists in selected word
+      word.split('').map((w, idx) => {
+        if (!selected.split('').includes(w)) {
+          arr[idx] = 0;
+          if (!letterStates[w]) {
+            letterStates[w] = 0;
+          }
         }
       })
 
@@ -164,7 +177,6 @@ function App() {
   return (
     <div className="container-fluid" onClick={e => input.current.focus()}>
       <div className="App">
-
         <h1 style={{fontWeight: 'bolder', margin: '20px 0 40px', textAlign: 'center'}}>
           <span className={'green-t'}>W</span>
           <span className={'yellow-t'}>O</span>
@@ -174,6 +186,7 @@ function App() {
           <span className={'yellow-t'}>E</span>
           <span className={'white-t'}>Türkçe</span>
         </h1>
+        <p>{selectedWord}</p>
 
         {guesses.map((item, index) => (
           <GuessedRow key={index} selected={selectedWord} word={item} onWin={winGame} />
@@ -202,7 +215,7 @@ function App() {
           maxLength={5}
           autoFocus
           value={guess}
-          onChange={e => setGuess(e.target.value)}
+          onChange={e => setGuess(e.target.value.toLocaleLowerCase('tr-TR'))}
           onKeyPress={handleKeyUp}
         />
 
