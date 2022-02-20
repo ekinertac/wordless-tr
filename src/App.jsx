@@ -10,7 +10,7 @@ if ("serviceWorker" in navigator) {
   registerSW();
 }
 
-const selectedWord = "kalem" //words[Math.floor(Math.random() * words.length)];
+const selectedWord = words[Math.floor(Math.random() * words.length)];
 const tr_chars = "abcçdefgğhiıjklmnoöprsştuüvyz"
 
 document.addEventListener('keydown', function (e) {
@@ -199,12 +199,14 @@ function App() {
           <GuessedRow key={index} word={''} />
         ))}
 
-        <div className={`status ${gameState}`} onClick={() => window.location.reload()}>
-          {gameState === 'won' && "Tebrikler!"}
-          {gameState === 'lost' && (
-            <div style={{fontWeight: 'normal'}}>Doğru Cevap: <span style={{fontWeight: 'bolder'}}>"{selectedWord}"</span></div>
-          )}
-        </div>
+        {gameState !== 'playing' && (
+          <div className={`status ${gameState}`} onClick={() => window.location.reload()}>
+            {gameState === 'won' && "Tebrikler!"}
+            {gameState === 'lost' && (
+              <div style={{fontWeight: 'normal'}}>Doğru Cevap: <span style={{fontWeight: 'bolder'}}>"{selectedWord}"</span></div>
+            )}
+          </div>
+        )}
 
         {gameState !== 'playing' && <div className="status gray" onClick={() => window.location.reload()}>Yeniden Başlayın!</div>}
 
