@@ -1,33 +1,82 @@
 import {useEffect, useRef, useState} from 'react'
 import './App.css'
-import 'bootstrap/dist/css/bootstrap.min.css'
+import 'bootstrap/dist/css/bootstrap-grid.min.css'
 import words from './words';
+import konamiHandler from './konamiHandler'
+import { registerSW } from "virtual:pwa-register";
+
+if ("serviceWorker" in navigator) {
+  // && !/localhost/.test(window.location)) {
+  registerSW();
+}
 
 const selectedWord = words[Math.floor(Math.random() * words.length)];
+const tr_chars = "abcçdefgğhiıjklmnoöprsştuüvyz"
 
-console.log(selectedWord)
+document.addEventListener('keydown', function (e) {
+  konamiHandler(e, selectedWord)
+}, false);
 
 const char = (c) => {
   return c?.toLocaleUpperCase('tr-TR')
 }
 
-const GuessedRow = ({winner, word, onWin}) => {
+const multiIndexOf = function (arr, el) {
+  const idxs = [];
+  for (let i = arr.length - 1; i >= 0; i--) {
+    if (arr[i] === el) {
+      idxs.unshift(i);
+    }
+  }
+  return idxs;
+}
+
+const writeStats = (state) => {
+  const prevState = JSON.parse(window.localStorage.getItem('stats') || '[]')
+  window.localStorage.setItem('stats', JSON.stringify([...prevState, state]))
+}
+
+const loadStats = () => {
+  const prevState = JSON.parse(window.localStorage.getItem('stats') || '[]')
+
+  let won = 0;
+  let lost = 0;
+  const total = prevState.length;
+
+  prevState.map(item => {
+    if (item === 'won') won += 1
+    if (item === 'lost') lost += 1
+  })
+
+  return {won, lost, total}
+}
+
+const GuessedRow = ({selected, word, onWin}) => {
   const [status, setStatus] = useState([...new Array(5).map(() => 0)])
 
   useEffect(() => {
     let arr = [];
 
-    if (winner && word) {
-      if (winner === word) {
+    if (selected && word) {
+
+      if (selected === word) {
         setStatus([2, 2, 2, 2, 2]);
         onWin()
         return null;
       }
 
-      arr = [...word.split('').map(w => winner.split('').includes(w))].map(x => x ? 1 : 0);
-
       word.split('').map((w, idx) => {
-        if (winner.split('')[idx] === w) {
+        multiIndexOf(selected.split(''), w).map(x => {
+          arr[idx] = 1;
+        })
+
+        if (!selected.split('').includes(w)) {
+          // if char not exists in selected word
+          arr[idx] = 0;
+        }
+
+        if (selected.split('')[idx] === w) {
+          // if char is correct place in the selected word
           arr[idx] = 2
         }
       })
@@ -35,7 +84,7 @@ const GuessedRow = ({winner, word, onWin}) => {
       setStatus(arr)
 
     }
-  }, [winner, word]);
+  }, [selected, word]);
 
   return (
     <div className="row">
@@ -64,17 +113,31 @@ function App() {
   const input = useRef();
   const [guess, setGuess] = useState('');
   const [guesses, setGuesses] = useState([]);
+  const [disabled, setDisabled] = useState(false);
+  const [gameState, setGameState] = useState('playing');
+
+  const {won, lost, total} = loadStats();
 
   useEffect(() => {
     input.current.focus()
   }, []);
+
+  useEffect(() => {
+    if (guesses.length === 6) {
+      setDisabled(true);
+      if (gameState === 'playing') {
+        setGameState('lost')
+        lostGame()
+      }
+    }
+  }, [guesses]);
 
   const handleKeyUp = ({key}) => {
     if (key === 'Enter') {
       // alert if guess is not in the word list
       if (!words.includes(guess)) {
         setGuess('');
-        return alert('Yanlış kelime')
+        return alert('Hatalı kelime')
       }
 
       // add guess to guessed word list
@@ -87,27 +150,52 @@ function App() {
   }
 
   const winGame = () => {
-    alert('Tebrikler!')
+    setDisabled(true);
+    setGameState('won');
+    writeStats('won');
+  }
+
+  const lostGame = () => {
+    setDisabled(true);
+    setGameState('lost');
+    writeStats('lost');
   }
 
   return (
     <div className="container-fluid" onClick={e => input.current.focus()}>
       <div className="App">
 
-        <h1 style={{fontWeight: 'bolder', marginTop: 20}}>WORDLE Türkçe</h1>
-        <p style={{marginTop: 20}}>Limitsiz Türkçe Wordle</p>
+        <h1 style={{fontWeight: 'bolder', margin: '20px 0 40px', textAlign: 'center'}}>
+          <span className={'green-t'}>W</span>
+          <span className={'yellow-t'}>O</span>
+          <span className={'red-t'}>R</span>
+          <span className={'gray-t'}>D</span>
+          <span className={'green-t'}>L</span>
+          <span className={'yellow-t'}>E</span>
+          <span className={'white-t'}>Türkçe</span>
+        </h1>
 
         {guesses.map((item, index) => (
-          <GuessedRow key={index} winner={selectedWord} word={item} onWin={winGame}/>
+          <GuessedRow key={index} selected={selectedWord} word={item} onWin={winGame} />
         ))}
 
-        <Row word={guess} />
+        {guesses.length < 6 && <Row word={guess} />}
 
-        {[...new Array(5 - guesses.length)].map((x, index) => (
+        {guesses.length < 5 && [...new Array(5 - guesses.length)].map((x, index) => (
           <GuessedRow key={index} word={''} />
         ))}
 
+        <div className={`status ${gameState}`} onClick={() => window.location.reload()}>
+          {gameState === 'won' && "Tebrikler!"}
+          {gameState === 'lost' && (
+            <div style={{fontWeight: 'normal'}}>Doğru Cevap: <span style={{fontWeight: 'bolder'}}>"{selectedWord}"</span></div>
+          )}
+        </div>
+
+        {gameState !== 'playing' && <div className="status gray" onClick={() => window.location.reload()}>Yeniden Başlayın!</div>}
+
         <input
+          disabled={disabled}
           className={'input'}
           ref={input}
           type="text"
@@ -117,6 +205,30 @@ function App() {
           onChange={e => setGuess(e.target.value)}
           onKeyPress={handleKeyUp}
         />
+
+        <div className="tr-chars">
+          {tr_chars.split('').map((x, idx) => {
+            const usedChars = guesses.join('').split('')
+            return (
+              <span
+                key={idx}
+                className={
+                  `${usedChars.includes(x) && 'gray-t'}
+                `}
+              >
+                {char(x)}
+              </span>
+            )
+          })}
+        </div>
+
+      </div>
+
+      <div className="stats">
+        <div className="d">istatistik</div>
+        <span className={'green-t'}>{won} <span className="s">kazanan</span></span> / {" "}
+        <span className={'red-t'}>{lost} <span className="s">kaybeden</span></span> / {" "}
+        <span className={'yellow-t'}>{total} <span className="s">toplam</span></span>
       </div>
     </div>
   )

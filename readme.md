@@ -7,11 +7,11 @@ Original idea and implementation: [@powerlanguage](https://github.com/powerlangu
 #### Install
 
 ```bash
-    yarn install
+    yarn install``
     yarn start
 ```
 
 
-#### Contributions
+    #### Contributions
 
 I've built this project in couple hours, code is shitty enough. Any PR is welcomed.

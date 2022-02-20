@@ -1,48 +1,93 @@
 body {
-  background: #282c34!important;
-  color: #fff!important;
+    background: #282c34 !important;
+    color: #fff !important;
 }
 
 .container-fluid {
-  height: 100vh;
+    height: 100vh;
 }
 
 .App {
-  width: 500px;
-  margin: 0 auto;
+    width: 350px;
+    margin: 0 auto;
 }
 
 .box {
-  aspect-ratio: 1;
-  font-size: 50px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-weight: bolder;
-  margin-bottom: 10px;
-  margin-right: 10px;
-  border: 5px solid #363942;
-  border-radius: 5px;
+    aspect-ratio: 1;
+    font-size: 35px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bolder;
+    margin-bottom: 5px;
+    margin-right: 5px;
+    border: 5px solid #363942;
+    border-radius: 5px;
 }
 
 .box.has-letter {
-  border: 5px solid #72777c;
+    border: 5px solid #72777c;
 }
 
-.box.green {
-  background: #2ecc71;
-}
-.box.yellow {
-  background: #f1c40f;
-}
+.green {background: #2ecc71}
+.yellow {background: #f1c40f}
+.red {background: #e74c3c}
+.gray {background: #72777c}
 
-.box.gray {
-  background: #72777c;
-}
+.white-t {color: #fff}
+.gray-t {color: #72777c}
+.yellow-t {color: #f1c40f}
+.green-t {color: #2ecc71}
+.red-t {color: #e74c3c}
+
 
 .input {
-  background: #282c34!important;
-  color: #282c34!important;
-  outline: 0;
-  border: 0;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.status {
+    border-radius: 5px;
+    font-weight: bolder;
+    padding: 5px 10px;
+    margin-top: 30px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.status.won:hover {
+    background: rgba(46, 204, 113, 0.83);
+}
+
+.status.won {
+    background: #2ecc71;
+}
+
+.stats {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+}
+
+.stats .s, .stats .d {
+    display: none;
+}
+
+.stats:hover .s {
+    display: inline;
+}
+
+.stats:hover .d {
+    display: block;
+}
+
+.tr-chars {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bolder;
+    font-size: .8em;
+    letter-spacing: 4px;
+    color: #ccc;
 }
