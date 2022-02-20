@@ -186,7 +186,8 @@ function App() {
           <span className={'yellow-t'}>E</span>
           <span className={'white-t'}>Türkçe</span>
         </h1>
-        <p>{selectedWord}</p>
+
+        {/*<p>{selectedWord}</p>*/}
 
         {guesses.map((item, index) => (
           <GuessedRow key={index} selected={selectedWord} word={item} onWin={winGame} />
